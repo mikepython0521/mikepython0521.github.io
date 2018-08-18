@@ -141,18 +141,18 @@ function fillDebugText(chara, enemy){
     }
     ctx.textAlign = 'start';
     ctx.fillStyle = 'rgba(100, 100, 255, 0.75)';
-    ctx.font = "14px 'ＭＳ ゴシック'"
-    var text = 'DEBUG -> ' + enemy[0].position.y + ' : ' + enemy[0].size + ' : ' + screenCanvas.width + ' : ' + screenCanvas.height + ' : ' +boolean;
+    ctx.font = "18px 'ＭＳ ゴシック'"
+//    var text = 'DEBUG -> ' + enemy[0].position.y + ' : ' + enemy[0].size + ' : ' + screenCanvas.width + ' : ' + screenCanvas.height + ' : ' +boolean;
+//    ctx.fillText(text,50,75);
+    var text = 'SCORE : ' + counter + ' LIFE : ' + chara.life;
     ctx.fillText(text,50,50);
-    var text = 'SCORE -> ' + counter + ' LIFE -> ' + chara.life;
-    ctx.fillText(text,50,75);
 }
 
 function fillGameOverText(){
   if(!working){
     ctx.textAlign = 'center';
     ctx.fillStyle = 'rgba(100, 100, 255, 0.75)';
-    ctx.font = "14px 'ＭＳ ゴシック'"
+    ctx.font = "18px 'ＭＳ ゴシック'"
     var text = 'GAME OVER';
     ctx.fillText(text,screenCanvas.width/2,screenCanvas.height/2,screenCanvas.width/5);
 
