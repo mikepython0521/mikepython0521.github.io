@@ -6,6 +6,7 @@ class Enemy {
       this.speed_x = 0;
       this.speed_y = 0;
       this.alive = false;
+      this.type = 0;
     }
     set size(size) {
       this._size = size;
@@ -13,13 +14,19 @@ class Enemy {
     get size() {
       return this._size;
     }
-    init(size, position, speed_x, speed_y) {
+    init(size, position, speed_x, speed_y, type) {
       this.size = size;
       this.position.x = position.x;
       this.position.y = position.y;
       this.speed_x = speed_x;
       this.speed_y = speed_y;
       this.alive = true;
+      this.type = type;
+      if(this.type == 0){
+        this.color = 'rgba(255, 0, 0, 0.75)';
+      }else if (this.type == 1){
+        this.color = 'rgba(0, 255, 0, 0.75)';        
+      }
     }
 
     move(screenCanvas){

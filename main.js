@@ -19,7 +19,7 @@ class Point {
 
 
 // - global -------------------------------------------------------------------
-var container, screenCanvas;
+var container, screenCanvas, backImage;
 var run = true;
 var fps = 1000 /30;
 var mouse = new Point();
@@ -28,10 +28,13 @@ var click = false;
 var ENEMY_MAX_COUNT = 10;
 var ENEMY_MAX_SPEED = 20;
 var ENEMY_MIN_SPEED = -20;
+var ENEMY_TYPE = 0;
+var RECOVERY_TYPE = 1;
 var counter = 0;
 // - main ---------------------------------------------------------------------
 window.onload = function(){
-
+    backImage = new Image();
+    backImage.src = 'space.png';
     // スクリーンの初期化
     container = document.getElementById('wrap');
     screenCanvas = document.getElementById('screen');
@@ -68,6 +71,7 @@ window.onload = function(){
 
         judgeCollision(chara, enemy);
 
+        fillBackImage();
         fillCharacter(chara);
         fillEnemies(enemy);
 
@@ -107,6 +111,19 @@ function cancelEvent(event){
   event.preventDefault();
 }
 
+function fillBackImage(event){
+  // 現在のパスをリセットする
+  ctx.beginPath();
+  // 繰り返しパターンの作成
+  var pattern = ctx.createPattern(backImage, 'repeat');
+  // 塗りつぶしスタイルの設定
+  ctx.fillStyle = pattern;
+  // パスに矩形のサブパスを追加する
+  ctx.rect(0,0,screenCanvas.width,screenCanvas.height);
+  // 現在の塗りつぶしスタイルでサブパスを塗りつぶす
+  ctx.fill();
+}
+
 function fillDebugText(chara, enemy){
     var boolean;
     if(chara.clockwise){
@@ -125,7 +142,7 @@ function moveCharacter(chara){
 }
 
 function createEnemy(enemy){
-  if(counter % 100 == 0){
+  if(counter % 1000 == 0){
     // すべてのエネミーを調査する
     for(i = 0; i < ENEMY_MAX_COUNT; i++){
         // エネミーの生存フラグをチェック
@@ -136,8 +153,27 @@ function createEnemy(enemy){
             p.y = Math.floor( Math.random() * (screenCanvas.height + 1 - 0) ) + 0 ;
             var speed_x = Math.floor( Math.random() * (ENEMY_MAX_SPEED + 1 - ENEMY_MIN_SPEED) ) + ENEMY_MIN_SPEED ;
             var speed_y = Math.floor( Math.random() * (ENEMY_MAX_SPEED + 1 - ENEMY_MIN_SPEED) ) + ENEMY_MIN_SPEED ;
+            var type = RECOVERY_TYPE ;
             // エネミーを新規にセット
-            enemy[i].init(enemySize, p, speed_x, speed_y);
+            enemy[i].init(enemySize, p, speed_x, speed_y, type);
+            // 1体出現させたのでループを抜ける
+            break;
+        }
+    }
+  }else if(counter % 100 == 0){
+    // すべてのエネミーを調査する
+    for(i = 0; i < ENEMY_MAX_COUNT; i++){
+        // エネミーの生存フラグをチェック
+        if(!enemy[i].alive){
+            var enemySize = 15;
+            var p = new Point();
+            p.x = 0 ;
+            p.y = Math.floor( Math.random() * (screenCanvas.height + 1 - 0) ) + 0 ;
+            var speed_x = Math.floor( Math.random() * (ENEMY_MAX_SPEED + 1 - ENEMY_MIN_SPEED) ) + ENEMY_MIN_SPEED ;
+            var speed_y = Math.floor( Math.random() * (ENEMY_MAX_SPEED + 1 - ENEMY_MIN_SPEED) ) + ENEMY_MIN_SPEED ;
+            var type = ENEMY_TYPE ;
+            // エネミーを新規にセット
+            enemy[i].init(enemySize, p, speed_x, speed_y, type);
             // 1体出現させたのでループを抜ける
             break;
         }
@@ -162,7 +198,11 @@ function judgeCollision(chara, enemy){
       if(p.calculateLength() < chara.size + enemy[i].size){
         // 衝突していたら生存フラグを降ろす
         enemy[i].alive = false;
-        chara.life--;
+        if(enemy[i].type == ENEMY_TYPE){
+          chara.life--;
+        }else if(enemy[i].type == RECOVERY_TYPE){
+          chara.life++;
+        }
         break;
       }
     }
@@ -177,14 +217,13 @@ function fillCharacter(chara){
   }
 
 function fillEnemies(enemy){
-  ctx.beginPath();
   for(i = 0; i < ENEMY_MAX_COUNT; i++){
       // エネミーの生存フラグをチェック
       if(enemy[i].alive){
+        ctx.beginPath();
         ctx.arc(enemy[i].position.x, enemy[i].position.y, enemy[i].size, 0, Math.PI * 2, false);
         ctx.fillStyle = enemy[i].color;
-        ctx.closePath();
+        ctx.fill();
       }
   }
-  ctx.fill();
 }
