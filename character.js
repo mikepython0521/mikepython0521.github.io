@@ -11,6 +11,7 @@ class Character {
       this.moveCenterFlag = false;
       this.angle_speed = 7;
       this.radius = 100;
+      this.life = 3;
     }
     set size(size) {
       this._size = size;

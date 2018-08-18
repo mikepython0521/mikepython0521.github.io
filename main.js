@@ -1,9 +1,22 @@
 // - common -------------------------------------------------------------------
 
-function Point(){
+class Point {
+  constructor(){
     this.x = 0;
     this.y = 0;
+  }
+  distance(p){
+    var q = new Point();
+    q.x = p.x - this.x;
+    q.y = p.y - this.y;
+    return q;
+  }
+  calculateLength(){
+    var length = Math.sqrt(this.x * this.x + this.y * this.y);
+    return length;
+  }
 }
+
 
 // - global -------------------------------------------------------------------
 var container, screenCanvas;
@@ -44,15 +57,16 @@ window.onload = function(){
         // HTMLを更新
         ctx.clearRect(0, 0, screenCanvas.width, screenCanvas.height);
 
+        createEnemy(enemy);
 
         if(click){
           chara.switchClockWise();
           click = false;
         }
-        chara.move(click, screenCanvas);
-
-        createEnemy(enemy);
+        moveCharacter(chara);
         moveEnemies(enemy);
+
+        judgeCollision(chara, enemy);
 
         fillCharacter(chara);
         fillEnemies(enemy);
@@ -102,6 +116,12 @@ function fillDebugText(chara, enemy){
     }
     var text = 'DEBUG -> ' + enemy[0].position.y + ' : ' + enemy[0].size + ' : ' + screenCanvas.width + ' : ' + screenCanvas.height + ' : ' +boolean;
     ctx.fillText(text,10,50);
+    var text = 'SCORE -> ' + counter + ' LIFE -> ' + chara.life;
+    ctx.fillText(text,10,75);
+}
+
+function moveCharacter(chara){
+  chara.move(click, screenCanvas);
 }
 
 function createEnemy(enemy){
@@ -134,6 +154,20 @@ function moveEnemies(enemy){
   }
 }
 
+function judgeCollision(chara, enemy){
+  for(i = 0; i < ENEMY_MAX_COUNT; i++){
+    if(enemy[i].alive){
+      // エネミーと自機ショットとの距離を計測
+      var p = enemy[i].position.distance(chara.position);
+      if(p.calculateLength() < chara.size + enemy[i].size){
+        // 衝突していたら生存フラグを降ろす
+        enemy[i].alive = false;
+        chara.life--;
+        break;
+      }
+    }
+  }
+}
 
 function fillCharacter(chara){
     ctx.beginPath();
