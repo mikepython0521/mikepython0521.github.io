@@ -104,9 +104,11 @@ function calculateCharacter(chara){
   if(chara.angle > 360){
     chara.angle = chara.angle - 360;
   }
+  if(chara.angle < 0){
+    chara.angle = chara.angle + 360;
+  }
   chara.position.x = chara.center.x + chara.radius * Math.cos(chara.angle * (Math.PI / 180));
   chara.position.y = chara.center.y + chara.radius * Math.sin(chara.angle * (Math.PI / 180));
-
 }
 
 function fillCharacter(chara){
