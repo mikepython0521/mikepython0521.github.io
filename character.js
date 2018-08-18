@@ -8,8 +8,9 @@ class Character {
       this.center.y = 200;
       this.angle = 0;
       this.clockwise = true;
-      this.angle_speed = 5;
-      this.radius = 70;
+      this.moveCenterFlag = false;
+      this.angle_speed = 7;
+      this.radius = 100;
     }
     set size(size) {
       this._size = size;

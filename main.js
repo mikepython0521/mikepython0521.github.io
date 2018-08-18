@@ -28,7 +28,7 @@ window.onload = function(){
     //iOSでスクロールを禁止する
     window.addEventListener('touchmove', cancelEvent, true);
 
-    var chara = new Character(10);
+    var chara = new Character(20);
 
     // ループ処理を呼び出す
     (function(){
@@ -38,6 +38,7 @@ window.onload = function(){
           }else{
             chara.clockwise = true;
           }
+          chara.moveCenterFlag = true;
           click = false;
         }
 
@@ -107,8 +108,30 @@ function calculateCharacter(chara){
   if(chara.angle < 0){
     chara.angle = chara.angle + 360;
   }
+  if(chara.moveCenterFlag){
+    chara.center.x = chara.center.x + chara.radius * Math.cos(chara.angle * (Math.PI / 180)) * 2;
+    chara.center.y = chara.center.y + chara.radius * Math.sin(chara.angle * (Math.PI / 180)) * 2;
+    chara.angle = chara.angle + 180;
+    chara.moveCenterFlag = false;
+  }
   chara.position.x = chara.center.x + chara.radius * Math.cos(chara.angle * (Math.PI / 180));
   chara.position.y = chara.center.y + chara.radius * Math.sin(chara.angle * (Math.PI / 180));
+
+  if(chara.position.x < 0 ){
+    chara.position.x = chara.position.x + screenCanvas.width;
+    chara.center.x = chara.center.x + screenCanvas.width;
+  }else if(chara.position.x > screenCanvas.width){
+    chara.position.x = chara.position.x - screenCanvas.width;
+    chara.center.x = chara.center.x - screenCanvas.width;
+  }
+  if(chara.position.y < 0 ){
+    chara.position.y = chara.position.y + screenCanvas.height;
+    chara.center.y = chara.center.y + screenCanvas.height;
+  }else if(chara.position.y > screenCanvas.height){
+    chara.position.y = chara.position.y - screenCanvas.height;
+    chara.center.y = chara.center.y - screenCanvas.height;
+  }
+
 }
 
 function fillCharacter(chara){
