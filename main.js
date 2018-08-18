@@ -8,7 +8,7 @@ function Point(){
 // - global -------------------------------------------------------------------
 var container, screenCanvas;
 var run = true;
-var fps = 1000 / 30;
+var fps = 1000 /30;
 var mouse = new Point();
 var ctx;
 var click = false;
@@ -25,7 +25,7 @@ window.onload = function(){
     screenCanvas.addEventListener('mousedown', mouseDown, true);
     window.addEventListener('keydown', keyDown, true);
     window.addEventListener('resize', sizing, false);
-    //iOS用
+    //iOSでスクロールを禁止する
     window.addEventListener('touchmove', cancelEvent, true);
 
     var chara = new Character(10);
@@ -44,7 +44,7 @@ window.onload = function(){
         // HTMLを更新
         ctx.clearRect(0, 0, screenCanvas.width, screenCanvas.height);
         fillDebugText(chara);
-
+        calculateCharacter(chara);
 //        chara.position.x = mouse.x;
 //        chara.position.y = mouse.y;
 
@@ -91,8 +91,18 @@ function fillDebugText(chara){
     }else{
       boolean = 'false'
     }
-    var text = 'DEBUG -> ' + mouse.x + ' : ' + mouse.y + ' : ' + screenCanvas.width + ' : ' + screenCanvas.height + ' : ' +boolean;
+    var text = 'DEBUG -> ' + chara.angle + ' : ' + chara.position.y + ' : ' + screenCanvas.width + ' : ' + screenCanvas.height + ' : ' +boolean;
     ctx.fillText(text,10,50);
+}
+
+function calculateCharacter(chara){
+  chara.angle = chara.angle + chara.angle_speed;
+  if(chara.angle > 360){
+    chara.angle = chara.angle - 360;
+  }
+  chara.position.x = chara.center.x + chara.radius * Math.cos(chara.angle * (Math.PI / 180));
+  chara.position.y = chara.center.y + chara.radius * Math.sin(chara.angle * (Math.PI / 180));
+
 }
 
 function fillCharacter(chara){
