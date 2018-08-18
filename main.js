@@ -25,6 +25,8 @@ window.onload = function(){
     screenCanvas.addEventListener('mousedown', mouseDown, true);
     window.addEventListener('keydown', keyDown, true);
     window.addEventListener('resize', sizing, false);
+    //iOS用
+    window.addEventListener('touchmove', cancelEvent);
 
     var chara = new Character(10);
 
@@ -43,8 +45,8 @@ window.onload = function(){
         ctx.clearRect(0, 0, screenCanvas.width, screenCanvas.height);
         fillDebugText(chara);
 
-        chara.position.x = mouse.x;
-        chara.position.y = mouse.y;
+//        chara.position.x = mouse.x;
+//        chara.position.y = mouse.y;
 
 
         fillCharacter(chara);
@@ -76,6 +78,10 @@ function keyDown(event){
 
     // Escキーが押されていたらフラグを降ろす
     if(ck === 27){run = false;}
+}
+
+function cancelEvent(event){
+  event.preventDefault();
 }
 
 function fillDebugText(chara){
