@@ -12,6 +12,10 @@ var fps = 1000 /30;
 var mouse = new Point();
 var ctx;
 var click = false;
+var ENEMY_MAX_COUNT = 10;
+var ENEMY_MAX_SPEED = 20;
+var ENEMY_MIN_SPEED = -20;
+var counter = 0;
 // - main ---------------------------------------------------------------------
 window.onload = function(){
 
@@ -29,28 +33,32 @@ window.onload = function(){
     window.addEventListener('touchmove', cancelEvent, true);
 
     var chara = new Character(20);
+    var enemy = new Array(ENEMY_MAX_COUNT);
+    for(i = 0; i < ENEMY_MAX_COUNT; i++){
+      enemy[i] = new Enemy();
+    }
 
     // ループ処理を呼び出す
     (function(){
-        if(click){
-          if(chara.clockwise == true){
-            chara.clockwise = false;
-          }else{
-            chara.clockwise = true;
-          }
-          chara.moveCenterFlag = true;
-          click = false;
-        }
-
+        counter++;
         // HTMLを更新
         ctx.clearRect(0, 0, screenCanvas.width, screenCanvas.height);
-        fillDebugText(chara);
-        calculateCharacter(chara);
-//        chara.position.x = mouse.x;
-//        chara.position.y = mouse.y;
 
+
+        if(click){
+          chara.switchClockWise();
+          click = false;
+        }
+        chara.move(click, screenCanvas);
+
+        createEnemy(enemy);
+        moveEnemies(enemy);
 
         fillCharacter(chara);
+        fillEnemies(enemy);
+
+        fillDebugText(chara, enemy);
+
         // フラグにより再帰呼び出し
         if(run){setTimeout(arguments.callee, fps);}
     })();
@@ -85,58 +93,64 @@ function cancelEvent(event){
   event.preventDefault();
 }
 
-function fillDebugText(chara){
+function fillDebugText(chara, enemy){
     var boolean;
     if(chara.clockwise){
       boolean = 'true';
     }else{
       boolean = 'false'
     }
-    var text = 'DEBUG -> ' + chara.angle + ' : ' + chara.position.y + ' : ' + screenCanvas.width + ' : ' + screenCanvas.height + ' : ' +boolean;
+    var text = 'DEBUG -> ' + enemy[0].position.y + ' : ' + enemy[0].size + ' : ' + screenCanvas.width + ' : ' + screenCanvas.height + ' : ' +boolean;
     ctx.fillText(text,10,50);
 }
 
-function calculateCharacter(chara){
-  if(chara.clockwise){
-    chara.angle = chara.angle + chara.angle_speed;
-  }else{
-    chara.angle = chara.angle - chara.angle_speed;
+function createEnemy(enemy){
+  if(counter % 100 == 0){
+    // すべてのエネミーを調査する
+    for(i = 0; i < ENEMY_MAX_COUNT; i++){
+        // エネミーの生存フラグをチェック
+        if(!enemy[i].alive){
+            var enemySize = 15;
+            var p = new Point();
+            p.x = 0 ;
+            p.y = Math.floor( Math.random() * (screenCanvas.height + 1 - 0) ) + 0 ;
+            var speed_x = Math.floor( Math.random() * (ENEMY_MAX_SPEED + 1 - ENEMY_MIN_SPEED) ) + ENEMY_MIN_SPEED ;
+            var speed_y = Math.floor( Math.random() * (ENEMY_MAX_SPEED + 1 - ENEMY_MIN_SPEED) ) + ENEMY_MIN_SPEED ;
+            // エネミーを新規にセット
+            enemy[i].init(enemySize, p, speed_x, speed_y);
+            // 1体出現させたのでループを抜ける
+            break;
+        }
+    }
   }
-  if(chara.angle > 360){
-    chara.angle = chara.angle - 360;
-  }
-  if(chara.angle < 0){
-    chara.angle = chara.angle + 360;
-  }
-  if(chara.moveCenterFlag){
-    chara.center.x = chara.center.x + chara.radius * Math.cos(chara.angle * (Math.PI / 180)) * 2;
-    chara.center.y = chara.center.y + chara.radius * Math.sin(chara.angle * (Math.PI / 180)) * 2;
-    chara.angle = chara.angle + 180;
-    chara.moveCenterFlag = false;
-  }
-  chara.position.x = chara.center.x + chara.radius * Math.cos(chara.angle * (Math.PI / 180));
-  chara.position.y = chara.center.y + chara.radius * Math.sin(chara.angle * (Math.PI / 180));
-
-  if(chara.position.x < 0 ){
-    chara.position.x = chara.position.x + screenCanvas.width;
-    chara.center.x = chara.center.x + screenCanvas.width;
-  }else if(chara.position.x > screenCanvas.width){
-    chara.position.x = chara.position.x - screenCanvas.width;
-    chara.center.x = chara.center.x - screenCanvas.width;
-  }
-  if(chara.position.y < 0 ){
-    chara.position.y = chara.position.y + screenCanvas.height;
-    chara.center.y = chara.center.y + screenCanvas.height;
-  }else if(chara.position.y > screenCanvas.height){
-    chara.position.y = chara.position.y - screenCanvas.height;
-    chara.center.y = chara.center.y - screenCanvas.height;
-  }
-
 }
+
+function moveEnemies(enemy){
+  for(i = 0; i < ENEMY_MAX_COUNT; i++){
+      // エネミーの生存フラグをチェック
+      if(enemy[i].alive){
+        enemy[i].move(screenCanvas);
+      }
+  }
+}
+
 
 function fillCharacter(chara){
     ctx.beginPath();
     ctx.fillStyle = chara.color;
     ctx.arc(chara.position.x, chara.position.y, chara.size, 0, Math.PI * 2, false);
     ctx.fill();
+  }
+
+function fillEnemies(enemy){
+  ctx.beginPath();
+  for(i = 0; i < ENEMY_MAX_COUNT; i++){
+      // エネミーの生存フラグをチェック
+      if(enemy[i].alive){
+        ctx.arc(enemy[i].position.x, enemy[i].position.y, enemy[i].size, 0, Math.PI * 2, false);
+        ctx.fillStyle = enemy[i].color;
+        ctx.closePath();
+      }
+  }
+  ctx.fill();
 }
