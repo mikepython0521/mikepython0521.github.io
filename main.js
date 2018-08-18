@@ -96,7 +96,11 @@ function fillDebugText(chara){
 }
 
 function calculateCharacter(chara){
-  chara.angle = chara.angle + chara.angle_speed;
+  if(chara.clockwise){
+    chara.angle = chara.angle + chara.angle_speed;
+  }else{
+    chara.angle = chara.angle - chara.angle_speed;
+  }
   if(chara.angle > 360){
     chara.angle = chara.angle - 360;
   }
