@@ -26,7 +26,7 @@ window.onload = function(){
     window.addEventListener('keydown', keyDown, true);
     window.addEventListener('resize', sizing, false);
     //iOS用
-    window.addEventListener('touchmove', cancelEvent);
+    window.addEventListener('touchmove', cancelEvent, true);
 
     var chara = new Character(10);
 
